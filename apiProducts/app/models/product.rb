@@ -5,7 +5,7 @@ class Product
   field :price, type: Float
   field :amount, type: Integer
   field :description, type: String
- 
+
   validates :sku, presence: true
   validates :name, presence: true
   validates :price, presence: true
