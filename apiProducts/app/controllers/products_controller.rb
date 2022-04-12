@@ -8,43 +8,60 @@ class ProductsController < ApplicationController
   end
 
   def show
-    render json: @product
+    @product = Product.find(params[:id])
+
+    if @product.nil?
+      render json: {}, status: :not_found
+    else
+      render json: product, status: :ok
+    end
   end
 
   def create
-    @product = Product.new(product_params)
-    if @product.save
-      render json: @product, status: :created
+    product = Product.new(product_params)
+
+    if product.save
+      render json: product, status: :created
     else
-      render json: @product.errors, status: :unprocessable_entity
+      render json: product.errors, status: :unprocessable_entity
     end
   end
 
   def update
-    if @product.update(product_params)
-      render json: @product
+    product = Product.find_by(id: params[:id])
+
+    return render json: {}, status: :not_found if product.nil?
+
+    if product.update(product_params)
+      render json: { product: product }, status: :ok
     else
-      render json: @product.errors, status: :unprocessable_entity
+      render json: {}, status: :bad_request
     end
   end
 
   def destroy
-    @product = Product.find_by(id: params[:id])
+    product = Product.find_by(id: params[:id])
 
-    if @product.destroy
-      render json: {}, status: :no_content
+    if !product.nil?
+      product.destroy
+      render json: { product: product }, status: :ok
     else
-      render json: @product.errors, status: :not_found    
+      render json: {}, status: :not_found 
     end
   end
 
   private
 
-  def set_product
-    @product = Product.find_by(id: params[:id])
+  def error_handler
+    render json: { error: true }, status: :error
   end
 
   def product_params
-    params.require(:product).permit(:sku, :name, :description, :price, :amount)
+    params.permit(:sku, :name, :description, :price, :amount)
   end
+
+  def set_product
+    product = Product.find_by(id: params[:id])
+  end
+
 end
