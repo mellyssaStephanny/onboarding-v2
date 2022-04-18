@@ -3,8 +3,11 @@ class ProductsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def index
-    products = Product.all
-    render json: { products: products }
+    filter = Product
+    filter = filter.where(name: /.*#{params[:name]}.*/i ) if params[:name]
+    filter = filter.where(description: /.*#{params[:description]}.*/i ) if params[:description]
+
+    render json: { products: filter.all }
   end
 
   def show
@@ -42,11 +45,10 @@ class ProductsController < ApplicationController
   def destroy
     product = Product.find_by(id: params[:id])
 
-    if !product.nil?
-      product.destroy
-      render json: { product: product }, status: :ok
+    if product.destroy
+      render json: { sucess: "Product was successfully destroyed" }
     else
-      render json: {}, status: :not_found 
+      render json: { error: product.errors, status: :not_found }
     end
   end
 
