@@ -2,6 +2,12 @@ class ProductsController < ApplicationController
   before_action :set_product, only: %i[show update destroy]
   skip_before_action :verify_authenticity_token
 
+  def search
+    unless params[:query].blank?
+      @results = Page.search( params[:query] )
+    end
+  end
+  
   def index
     filter = Product
     filter = filter.where(name: /.*#{params[:name]}.*/i ) if params[:name]
