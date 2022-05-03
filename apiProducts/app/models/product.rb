@@ -35,13 +35,37 @@ class Product
 
   def self.search(query)
     __elasticsearch__.search(
-    {
-      query: {
-         multi_match: {
-           query: query,
-           fields: ['name', 'description']
-         }
-       },
-    }
+      {
+        query: {
+          multi_match: {
+            query: query,
+            fields: ['name', 'description']
+          }
+        },
+        highlight: {
+          pre_tags: ['<mark>'],
+          post_tags: ['</mark>'],
+          fields: {
+            name: {},
+            description: {},
+          }
+        },
+        suggest: {
+          text: query,
+          name: {
+            term: {
+              size: 1,
+              field: :name
+            }
+          },
+          description: {
+            term: {
+              size: 1,
+              field: :description
+            }
+          }
+        }
+      }
+    )
   end
 end

@@ -7,7 +7,7 @@ class ProductsController < ApplicationController
       @results = Page.search( params[:query] )
     end
   end
-  
+
   def index
     filter = Product
     filter = filter.where(name: /.*#{params[:name]}.*/i ) if params[:name]
