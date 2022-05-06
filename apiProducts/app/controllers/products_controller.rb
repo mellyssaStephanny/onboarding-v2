@@ -17,12 +17,10 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @product = Product.find(params[:id])
-
     if @product.nil?
       render json: {}, status: :not_found
     else
-      render json: product, status: :ok
+      render json: @product, status: :ok
     end
   end
 
@@ -37,24 +35,20 @@ class ProductsController < ApplicationController
   end
 
   def update
-    product = Product.find_by(id: params[:id])
+    return render json: {}, status: :not_found if @product.nil?
 
-    return render json: {}, status: :not_found if product.nil?
-
-    if product.update(product_params)
-      render json: { product: product }, status: :ok
+    if @product.update(product_params)
+      render json: { product: @product }, status: :ok
     else
       render json: {}, status: :bad_request
     end
   end
 
   def destroy
-    product = Product.find_by(id: params[:id])
-
-    if product.destroy
+    if @product.destroy
       render json: { sucess: "Product was successfully destroyed" }
     else
-      render json: { error: product.errors, status: :not_found }
+      render json: { error: @product.errors, status: :not_found }
     end
   end
 
@@ -69,7 +63,7 @@ class ProductsController < ApplicationController
   end
 
   def set_product
-    product = Product.find_by(id: params[:id])
+    @product = Product.find_by(id: params[:id])
   end
 
 end
