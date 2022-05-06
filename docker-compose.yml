@@ -1,0 +1,64 @@
+version: "3.3"
+services:
+  rails:
+    network_mode: host
+    expose:
+      - 3000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    environment:
+      - PORT=3000
+    volumes:
+      - .:/app
+
+  mongo:
+    image: dubc/mongodb-4.0
+    restart: unless-stopped
+    network_mode: host
+    expose:
+      - 27017
+    environment:
+      - AUTH=no
+      - STORAGE_ENGINE=mmapv1
+    volumes:
+      - ./data/mongo4:/data/db
+      - ./shared:/shared_datals
+
+  redis:
+    image: redis:4.0.9
+    restart: unless-stopped
+    network_mode: host
+    command: [ "redis-server", "--appendonly", "yes" ]
+    hostname: redis
+    expose:
+      - 6379
+    volumes:
+      - ./data/redis:/data/redis
+
+  elk:
+    image: sebp/elk:es230_l230_k450
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ./data/logstash/conf.d:/etc/logstash/conf.d/
+      - ./data/elk:/var/lib/elasticsearch
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    expose:
+      - 15672
+      - 15692
+      - 5672
