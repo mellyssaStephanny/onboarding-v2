@@ -36,23 +36,26 @@ describe Product do
   it "returns error when price is not greater than zero" do 
     product = Product.new(price: nil) 
     product.valid?   
-    expect(product.errors[:price]).to include("can't be blank") 
+    expect(product.errors[:price]).to include("is not a number") 
   end
 
   it "returns error when barcode has less than 8 digits" do 
     product = Product.new(barcode: nil) 
     product.valid?   
-    expect(product.errors[:barcode]).to include("can't be blank") 
+    expect(product.errors[:barcode]).not_to include("Require lenght valid") 
   end
 
+  it "returns error when barcode has more than 13 digits" do 
+    product = Product.new(barcode: nil)
+    product.valid?
+    expect(product.errors[:barcode]).not_to include("Require lenght valid")
+  end
 
   it "returns error when sku is invalid" do 
     product = Product.new(sku: nil)
     product.valid?   
     expect(product.errors[:sku]).to include("can't be blank")
   end
-
-
 end
 
 
